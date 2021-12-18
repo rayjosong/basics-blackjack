@@ -38,11 +38,11 @@ var makeDeck = function () {
       if (cardName == 1) {
         cardName = "ace";
       } else if (cardName == 11) {
-        cardName = "jack";
+        cardName = 10;
       } else if (cardName == 12) {
-        cardName = "queen";
+        cardName = 10;
       } else if (cardName == 13) {
-        cardName = "king";
+        cardName = 10;
       }
 
       // Create a new card with the current name, suit, and rank
@@ -65,7 +65,7 @@ var makeDeck = function () {
 
   // Return the completed card deck
   return cardDeck;
-};
+}; // modified this for picture cards to become cardname 10 instead
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 var getRandomIndex = function (max) {
@@ -93,58 +93,132 @@ var shuffleCards = function (cardDeck) {
   return cardDeck;
 };
 
+// For loop to sum an array in javascript
+var sumCards = function (array) {
+  var sum = 0;
+
+  for (i = 0; i < array.length; i++) {
+    sum += array[i];
+  }
+
+  console.log(sum);
+
+  return sum;
+};
+
 // game modes
 var firstGameMode = "assign cards & test for early winners";
-var secondGameMode = "choose hit or stand for player";
+var secondGameMode = "player choose hit or stand";
 
 var currentGameMode = firstGameMode;
 
-var gameLogic = function () {
+// game mode logic
+
+var computerCards = [];
+var playerCards = [];
+
+var firstModeDealCards = function () {
+  var playerCard = shuffledDeck.pop();
+  playerCards.push(playerCard.name);
+  console.log(
+    "pushed 1st player card. Ensure all cards are pushed: " + playerCard.name
+  );
+  playerCard = shuffledDeck.pop();
+  playerCards.push(playerCard.name);
+  console.log(
+    "pushed 2nd player card. Ensure all cards are pushed: " + playerCard.name
+  );
+
+  // deal computerCards
+  var computerCard = shuffledDeck.pop();
+  computerCards.push(playerCard.name);
+  console.log(
+    "pushed 1st computer card. Ensure all cards are pushed: " +
+      computerCard.name
+  );
+  computerCard = shuffledDeck.pop();
+  computerCards.push(playerCard.name);
+  console.log(
+    "pushed 2nd computer card. Ensure all cards are pushed: " +
+      computerCard.name
+  );
+  console.log("player's holdings: " + playerCards);
+  console.log("computer's holdings: " + computerCards);
+
+  var sumPlayerCards = sumCards(playerCards);
+  var sumComputerCards = sumCards(computerCards);
+  var cardsAreAssignedText = `Player has: ${playerCards} and a total of ${sumPlayerCards} <br> Computer has: ${computerCards} and a total of ${sumComputerCards} <br> Please enter "hit" or "stand, then click Submit.`;
+  myOutputValue = cardsAreAssignedText;
+  currentGameMode = secondGameMode;
+  return myOutputValue;
+};
+
+var secondModePlayerChooseHS = function (input) {
+  // user decides to hit or stand, then computer decides to hit or stand
+
+  // user to decide. How?
+
+  // How: if input == hit, then proceed to draw another card if input == stand, then proceed to allow computer to choose
+  if (input == "hit") {
+    var playerCard = shuffledDeck.pop();
+    playerCards.push(playerCard.name);
+    console.log(
+      "player chose to hit. pushed 3rd computer card. Pushed card: " +
+        playerCard.name
+    );
+    console.log("player's holdings: " + playerCards);
+
+    sumPlayerCards = sumCards(playerCards);
+    sumComputerCards = sumCards(computerCards);
+
+    // now check if there are winning or losing conditions
+    summarySoFarText = `Player chose to hit. Player now has ${playerCards} and a total of ${sumPlayerCards}. <br> Computer has ${computerCards} and a total of ${sumComputerCards}. `;
+
+    if (sumPlayerCards > 21) {
+      myOutputValue =
+        summarySoFarText +
+        "<br><br>Player has busted and loses. Computer wins.";
+
+      return myOutputValue;
+    }
+
+    if (sumPlayerCards == 21) {
+      myOutputValue = summarySoFarText + "<br><br>Player has 21! Player wins.";
+    } else {
+      myOutputValue =
+        summarySoFarText + "<br><br> Player is still under 21. Continue on";
+      return myOutputValue;
+    }
+
+    // } else if (input == "stand") {
+    // } // remember to analyse player for winning conditions
+  }
+  //computer to decide
+};
+
+// output texts (only include those that don't have string literal to avoid logic flow issues)
+var myOutputValue = "";
+
+var main = function (input) {
   // create the deck
   deck = makeDeck();
   // run shuffle function
   shuffledDeck = shuffleCards(deck);
+
   // if is firstGameMode, deal cards to players
-  var computerCards = [];
-  var playerCards = [];
 
   if (currentGameMode == firstGameMode) {
-    // deal playerCards
-
-    var playerCard = shuffledDeck.pop();
-    playerCards.push(playerCard.rank);
-    console.log(
-      "pushed 1st player card. Ensure all cards are pushed: " + playerCard.rank
-    );
-    playerCard = shuffledDeck.pop();
-    playerCards.push(playerCard.rank);
-    console.log(
-      "pushed 2nd player card. Ensure all cards are pushed: " + playerCard.rank
-    );
-
-    // deal computerCards
-    var computerCard = shuffledDeck.pop();
-    computerCards.push(playerCard.rank);
-    console.log(
-      "pushed 1st computer card. Ensure all cards are pushed: " +
-        computerCard.rank
-    );
-    computerCard = shuffledDeck.pop();
-    computerCards.push(playerCard.rank);
-    console.log(
-      "pushed 2nd computer card. Ensure all cards are pushed: " +
-        computerCard.rank
-    );
-    console.log("player's holdings: " + playerCards);
-    console.log("computer's holdings: " + computerCards);
-
-    var cardsAreAssignedText = `Player has: ${playerCards} <br> Computer has: ${computerCards} <br> Please enter "hit" or "stand, then click Submit.`;
-    myOutputValue = cardsAreAssignedText;
-    currentGameMode = secondGameMode;
+    // execute firstModeDealCards
+    firstModeDealCards();
     return myOutputValue;
   }
 
   if (currentGameMode == secondGameMode) {
+    // user decides to hit or stand, then computer decides to hit or stand
+    secondModePlayerChooseHS(input);
+    return myOutputValue;
+
+    //computer to decide
   }
 
   // analyse cards for game winning conidtions e.g. Blackjack, tie, or normal win (only those immediate winning conditions for now)
@@ -160,10 +234,7 @@ var gameLogic = function () {
   // the game either ends of continues
 };
 
-// output texts (only include those that don't have string literal to avoid logic flow issues)
-var myOutputValue = "";
-
-var main = function (input) {
-  var finalOutput = gameLogic(input);
-  return finalOutput;
-};
+// var main = function (input) {
+//   var finalOutput = gameLogic(input);
+//   return finalOutput;
+// };
