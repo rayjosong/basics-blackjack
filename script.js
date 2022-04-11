@@ -12,15 +12,14 @@ SIMPLIFIED RULES
 
 // =========================== GLOBAL VARIABLES ===========================
 
-var computerCardsName = [];
+var dealerCardsName = [];
 var playerCardsName = [];
 
+var dealerCardsScore = [];
 var playerCardsScore = [];
-var computerCardsScore = [];
-
+var sumDealerCards = 0;
 var sumPlayerCards = 0;
-var sumComputerCards = 0;
-var summarySoFarText = `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br> Dealer has ${computerCardsName} and a total of ${sumComputerCards}. `;
+
 var myOutputValue;
 
 // ===========================  GAME MODES ===========================
@@ -33,6 +32,7 @@ var currentGameMode = firstGameMode;
 
 // =========================== HELPER FUNCTIONS ===========================
 var gameEnded = 0; // 0: game still in progress 1: game ended
+
 // deck creation function
 var makeDeck = function () {
   // Initialise an empty deck array
@@ -92,7 +92,6 @@ var makeDeck = function () {
   // Return the completed card deck
   return cardDeck;
 }; // modified this for picture cards to become cardname 10 instead
-
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 var getRandomIndex = function (max) {
   return Math.floor(Math.random() * max);
@@ -127,7 +126,7 @@ var sumCards = function (array) {
     sum += array[i];
   }
 
-  console.log("sumCards function, gives me sum of: " + sum);
+  // console.log("sumCards function, gives me sum of: " + sum);
 
   // variable ace. Got the idea from Cheena's code during redux
   for (let j = 0; j < array.length; j += 1) {
@@ -139,337 +138,307 @@ var sumCards = function (array) {
 };
 // Creating evaluatewinner to cover all scenarios
 
-//I noticed that I cannot use summarySoFarText within evaluate winner because it will always call back to the original global variable, thereby leading to sumComputerCards/sumPlayerCards == 0
-var evaluateWinner = function () {
+// I noticed that I cannot use summarySoFarText within evaluate winner because it will always call back to the original global variable, thereby leading to sumComputerCards/sumPlayerCards == 0
+// var evaluateWinner = function () {
+//   // if both P D are < 21, then compare who is higher. The one closer to 21 will win -> output text of winner
+//   if (sumPlayerCards <= 21 && sumDealerCards <= 21) {
+//     console.log("both are <21");
+//     if (sumPlayerCards == sumDealerCards) {
+//       console.log("draw");
+//       // draw
+//       // myOutputValue =
+//       //   `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+//       //   "<br><br><p style='color: red;'>The game is a draw.<br><br>Click submit to start game again.<p>";
+//       gameEnded = 1;
+//       // return myOutputValue;
+//       return "draw";
+//     }
+//     if (sumPlayerCards > sumDealerCards) {
+//       console.log("win");
+//       // player wins
+//       // myOutputValue =
+//       //   `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+//       //   "<br><br><p style='color: red;'>Congrats! The player received a higher hand. Therefore, player wins. <br><br>Click submit to start game again.</p>";
+//       gameEnded = 1;
+//       return "win";
+//     }
+//     if (sumPlayerCards < sumDealerCards) {
+//       console.log("lose");
+//       // dealer wins
+//       // myOutputValue =
+//       //   `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+//       //   "<br><br><p style:'color = red;'>The dealer received a higher hand. Therefore, dealer wins! <br><br>Click submit to start game again.</p>";
+//       gameEnded = 1;
+//       return "lose";
+//     }
+//   }
+
+//   if (sumPlayerCards > 21) {
+//     // player has busted
+//     myOutputValue =
+//       `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+//       "<br><br><p style='color: red;'>The player has busted! The dealer wins. <br><br>Click submit to start game again.</p>";
+
+//     gameEnded = 1;
+//     return myOutputValue;
+//   }
+//   if (sumComputerCards > 21) {
+//     myOutputValue =
+//       `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+//       "<br><br><p style='color: red;'>The dealer has busted! The player wins.<br><br>Click submit to start game again.</p>";
+//     gameEnded = 1;
+//     return myOutputValue;
+//   }
+//   if (sumPlayerCards > 21 && sumComputerCards > 21) {
+//     myOutputValue =
+//       `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+//       "<br><br><p style='color: red;'>Both player & dealer has busted. The game is a draw!<br><br>Click submit to start game again.</p>";
+//     gameEnded = 1;
+//     return myOutputValue;
+//   }
+// };
+
+// check if blackjack condition has been fulfilled
+var checkBlackJack = function () {
+  // Case 1: Yes, got blackjack
+  if (sumPlayerCards == 21 || sumDealerCards == 21) {
+    currentGameMode = blackjackMode;
+
+    if (currentGameMode == blackjackMode) {
+      if (sumPlayerCards == 21 && sumDealerCards == 21) {
+        console.log("dealer score: " + sumDealerCards);
+        console.log("player score: " + sumPlayerCards);
+        gameEnded = 1;
+
+        return `Player has ${sumPlayerCards}.<br>Dealer has ${sumDealerCards}.<br><br>There is a draw! Both player and dealer has gotten blackjack.<br><br>Click submit to play again.`;
+      }
+
+      if (sumDealerCards == 21) {
+        console.log("dealer score: " + sumDealerCards);
+        console.log("player score: " + sumPlayerCards);
+        return `Player has ${sumPlayerCards}.<br>Dealer has ${sumDealerCards}.<br><br>Dealer wins with a blackjack!<br><br>Click submit to play again.`;
+      }
+
+      if (sumPlayerCards == 21) {
+        console.log("dealer score: " + sumDealerCards);
+        console.log("player score: " + sumPlayerCards);
+        return `Player has ${sumPlayerCards}.<br>Dealer has ${sumDealerCards}.<br><br>Player wins with a blackjack!<br><br>Click submit to play again.`;
+      }
+    }
+  }
+};
+
+// ================== HTML FUNCTIONS ==================
+var shuffledDeck = shuffleCards(makeDeck());
+
+var deal = function () {
+  if (currentGameMode === firstGameMode && gameEnded == 0) {
+    console.log("dealing cards");
+    // deal player cards
+    for (i = 0; i < 2; i++) {
+      var playerCard = shuffledDeck.pop();
+      playerCardsName.push(playerCard.name);
+      playerCardsScore.push(playerCard.score);
+      console.log(`[Player] Pushed card ${i + 1}. In deck: ${playerCardsName}`);
+    }
+    // deal dealer cards
+    for (i = 0; i < 2; i++) {
+      var dealerCard = shuffledDeck.pop();
+      dealerCardsName.push(dealerCard.name);
+      dealerCardsScore.push(dealerCard.score);
+      console.log(`[Dealer] Pushed card ${i + 1}. In deck: ${dealerCardsName}`);
+    }
+
+    sumPlayerCards = sumCards(playerCardsScore);
+    sumDealerCards = sumCards(dealerCardsScore);
+    console.log(`Player score: ${sumPlayerCards}`);
+    console.log(`Dealer score: ${sumDealerCards}`);
+
+    // TODO: maybe output text for player/dealer score?
+    myOutputValue = `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}<br><br>
+    
+    <p style='color: red;'><i>Click hit or stand to continue.</i></p>`;
+
+    currentGameMode = secondGameMode;
+    return myOutputValue;
+  }
+
+  if (currentGameMode != firstGameMode && gameEnded == 0) {
+    return `<p style='color:red;'>Please click 'hit' or 'stand' to continue</p>`;
+  }
+
+  if (gameEnded == 1) {
+    return `<p style='color:red;'>Game has ended. Please refresh to play again</p>`;
+  }
+};
+
+var hit = function () {
+  dealerHS();
+  if (currentGameMode === secondGameMode && gameEnded == 0) {
+    console.log(
+      `Player holdings: ${playerCardsName} <br>Player score: ${sumPlayerCards}`
+    );
+    console.log("player chose to hit");
+    playerCard = shuffledDeck.pop();
+    playerCardsScore.push(playerCard.score);
+    playerCardsName.push(playerCard.name);
+
+    sumPlayerCards = sumCards(playerCardsScore);
+    sumDealerCards = sumCards(dealerCardsScore);
+
+    // myOutputValue = `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${dealerCardsScore}<br><br><i>Click hit or stand to continue.</i>`;
+    var playerText = `Player chose to hit. <br><br><u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}`;
+    console.log(playerText);
+
+    if (sumDealerCards > 21 && sumPlayerCards > 21) {
+      gameEnded = 1;
+      return (
+        playerText +
+        "<p style='color: red;'><br><br>Both player and dealer has busted. Nobody wins! Refresh to restart game.</p>"
+      );
+    }
+
+    if (sumPlayerCards > 21) {
+      gameEnded = 1;
+      return (
+        playerText +
+        "<p style='color: red;'><br><br>Player has busted. Player loses! Refresh to restart game.</p>"
+      );
+    }
+
+    if (sumDealerCards > 21) {
+      gameEnded = 1;
+      return (
+        playerText +
+        "<p style='color: red;'><br><br>Dealer has busted. Player wins! Refresh to restart game.</p>"
+      );
+    } else {
+      return (
+        playerText +
+        '<p style="color: red;"><br><br><i>Click "hit" button or "stand" button to continue.</i></p>'
+      );
+    }
+  }
+
+  if ((gameEnded = 1)) {
+    return `<p style='color:red;'>Game has ended. Please refresh to play again</p>`;
+  }
+};
+
+var stand = function () {
+  console.log("player chose to stand");
   // if both P D are < 21, then compare who is higher. The one closer to 21 will win -> output text of winner
-  if (sumPlayerCards <= 21 && sumComputerCards <= 21) {
-    if (sumPlayerCards == sumComputerCards) {
+  if (sumPlayerCards <= 21 && sumDealerCards <= 21 && gameEnded == 0) {
+    console.log("both are <21");
+    if (sumPlayerCards == sumDealerCards) {
+      console.log("draw");
       // draw
       myOutputValue =
-        `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br> Dealer has ${computerCardsName} and a total of ${sumComputerCards}.` +
-        "<br><br>The game is a draw.<br><br>Click submit to start game again.";
+        `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+        "<br><br><p style='color: red;'>The game is a draw.<br><br>Refresh page to play again.<p>";
       gameEnded = 1;
+      return myOutputValue;
     }
-    if (sumPlayerCards > sumComputerCards) {
+    if (sumPlayerCards > sumDealerCards) {
+      console.log("win");
       // player wins
       myOutputValue =
-        `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br> Dealer has ${computerCardsName} and a total of ${sumComputerCards}.` +
-        "<br><br>Congrats! The player received a higher hand. Therefore, player wins. <br><br>Click submit to start game again.";
+        `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+        "<br><br><p style='color: red;'>Congrats! The player received a higher hand. Therefore, player wins. <br><br>Refresh page to play again..</p>";
       gameEnded = 1;
+      return myOutputValue;
     }
-    if (sumPlayerCards < sumComputerCards) {
+    if (sumPlayerCards < sumDealerCards) {
+      console.log("lose");
       // dealer wins
       myOutputValue =
-        `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br> Dealer has ${computerCardsName} and a total of ${sumComputerCards}.` +
-        "<br><br>The dealer received a higher hand. Therefore, dealer wins! <br><br>Click submit to start game again.";
+        `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+        "<br><br><p style='color = red;'>The dealer received a higher hand. Therefore, dealer wins! <br><br>Refresh page to play again..</p>";
       gameEnded = 1;
+      return myOutputValue;
     }
-    return myOutputValue;
   }
 
   if (sumPlayerCards > 21) {
     // player has busted
     myOutputValue =
-      `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br> Dealer has ${computerCardsName} and a total of ${sumComputerCards}.` +
-      "<br><br>The player has busted! The dealer wins. <br><br>Click submit to start game again.";
+      `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+      "<br><br><p style='color: red;'>The player has busted! The dealer wins. <br><br>Refresh page to play again..</p>";
 
     gameEnded = 1;
     return myOutputValue;
   }
-  if (sumComputerCards > 21) {
+  if (sumDealerCards > 21) {
     myOutputValue =
-      `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br> Dealer has ${computerCardsName} and a total of ${sumComputerCards}.` +
-      "<br><br> The dealer has busted! The player wins.<br><br>Click submit to start game again.";
+      `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+      "<br><br><p style='color: red;'>The dealer has busted! The player wins.<br><br>Refresh page to play again..</p>";
     gameEnded = 1;
     return myOutputValue;
   }
-  if (sumPlayerCards > 21 && sumComputerCards > 21) {
+  if (sumPlayerCards > 21 && sumDealerCards > 21) {
     myOutputValue =
-      `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br> Dealer has ${computerCardsName} and a total of ${sumComputerCards}.` +
-      "Both player & dealer has busted. The game is a draw!<br><br>Click submit to start game again.";
+      `<u>Player</u> <br><br>Cards: ${playerCardsName}<br>Score: ${sumPlayerCards} <br><br><u>Dealer</u><br><br>Score: ${sumDealerCards}` +
+      "<br><br><p style='color: red;'>Both player & dealer has busted. The game is a draw!<br><br>Refresh page to play again.</p>";
     gameEnded = 1;
     return myOutputValue;
   }
-};
 
-// check if blackjack condition has been fulfilled
-var checkBlackJack = function (playerCards, computerCards) {
-  // Case 1: Yes, got blackjack
-  if (sumPlayerCards == 21 || sumComputerCards == 21) {
-    currentGameMode = blackjackMode;
-
-    if (currentGameMode == blackjackMode) {
-      if (sumPlayerCards == 21 && sumComputerCards == 21) {
-        console.log("dealer score: " + sumComputerCards);
-        console.log("player score: " + sumPlayerCards);
-        gameEnded = 1;
-
-        return `Player has ${sumPlayerCards}.<br>Dealer has ${sumComputerCards}.<br><br>There is a draw! Both player and dealer has gotten blackjack.<br><br>Click submit to play again.`;
-      }
-
-      if (sumComputerCards == 21) {
-        console.log("dealer score: " + sumComputerCards);
-        console.log("player score: " + sumPlayerCards);
-        return `Player has ${sumPlayerCards}.<br>Dealer has ${sumComputerCards}.<br><br>Dealer wins with a blackjack!<br><br>Click submit to play again.`;
-      }
-
-      if (sumPlayerCards == 21) {
-        console.log("dealer score: " + sumComputerCards);
-        console.log("player score: " + sumPlayerCards);
-        return `Player has ${sumPlayerCards}.<br>Dealer has ${sumComputerCards}.<br><br>Player wins with a blackjack!<br><br>Click submit to play again.`;
-      }
-    }
+  if (gameEnded == 1) {
+    return `<p style='color:red;'>Game has ended. Please refresh to play again</p>`;
   }
 };
 
-var firstModeDealCards = function () {
-  //deal cards and check for early winners
-  console.log("running firstmodedealcards function");
-  var playerCard = shuffledDeck.pop();
-  playerCardsName.push(playerCard.name);
-  playerCardsScore.push(playerCard.score);
-  console.log(
-    "pushed 1st player card. Ensure all cards are pushed: " + playerCard.name
-  );
-  playerCard = shuffledDeck.pop();
-  playerCardsName.push(playerCard.name);
-  playerCardsScore.push(playerCard.score);
-  console.log(
-    "pushed 2nd player card. Ensure all cards are pushed: " + playerCard.name
-  );
+// ================== MAIN FUNCTIONS ==================
 
-  // deal computerCards
-  var computerCard = shuffledDeck.pop();
-  computerCardsName.push(computerCard.name);
-  computerCardsScore.push(computerCard.score);
-  console.log(
-    "pushed 1st dealer card. Ensure all cards are pushed: " + computerCard.name
-  );
-  computerCard = shuffledDeck.pop();
-  computerCardsName.push(computerCard.name);
-  computerCardsScore.push(computerCard.score);
-  console.log(
-    "pushed 2nd dealer card. Ensure all cards are pushed: " + computerCard.name
-  );
-  console.log("player's holdings: " + playerCardsName);
-  console.log("player's score:" + playerCardsScore);
-  console.log("dealer's holdings: " + computerCardsName);
-  console.log("dealer's score:" + computerCardsScore);
-
-  sumPlayerCards = sumCards(playerCardsScore);
-  sumComputerCards = sumCards(computerCardsScore);
-  var summarySoFarText = `Player now has ${playerCardsName} and a total of ${sumPlayerCards}.`;
-
-  console.log("dealt first 2 cards to player and dealer respectively");
-
-  checkBlackJack(sumPlayerCards, sumComputerCards);
-
-  if (sumPlayerCards != 21 && sumComputerCards != 21) {
-    myOutputValue =
-      "Player and dealer are dealt 2 cards each.<br><br>" +
-      summarySoFarText +
-      "<br><br>Proceed to enter 'hit' or 'stand', then click submit.";
-    currentGameMode = secondGameMode;
-    return myOutputValue;
-  }
-};
-
-var secondModePlayerChooseHS = function (input) {
-  // user decides to hit or stand, then dealer decides to hit or stand
-
-  // How: if input == hit, then proceed to draw another card if input == stand, then proceed to allow dealer to choose
-  if (input.toLowerCase() != "hit" && input.toLowerCase() != "stand") {
-    console.log("input validation");
-
-    myOutputValue =
-      "You have inserted an invalid input. Please insert either 'hit' or 'stand'.";
-
-    return myOutputValue;
-    // Not sure why I tried to return "xxxx" directly but it didnt work, even though my console log tells me it works. Only myoutputvalue works
-    // return "You have inserted an invalid input. Please insert either 'hit' or 'stand'.";
-  }
-
-  if (input == "hit") {
-    console.log("player chose hit");
-    var playerCard = shuffledDeck.pop();
-    playerCardsScore.push(playerCard.score);
-    playerCardsName.push(playerCard.name);
-    console.log(
-      "player chose to hit. pushed 3rd player card. Pushed card: " +
-        playerCard.name
-    );
-    console.log("player's holdings: " + playerCardsName);
-
-    sumPlayerCards = sumCards(playerCardsScore);
-    sumComputerCards = sumCards(computerCardsScore);
-
-    // now check if there are winning or losing conditions
-    summarySoFarText = `Player chose to hit. Player now has ${playerCardsName} and a total of ${sumPlayerCards}.`;
-
-    if (sumPlayerCards > 21) {
-      gameEnded = 1;
-      myOutputValue =
-        summarySoFarText +
-        "<br><br>Player has busted. Player loses! Click submit again to restart game.";
-      return myOutputValue;
-    } else {
-      myOutputValue =
-        summarySoFarText +
-        "<br><br>Player, please enter 'hit' or 'stand', then click submit.";
-      currentGameMode = secondGameMode;
-      return myOutputValue;
-    }
-  }
-
-  if (input == "stand") {
-    console.log("player chose stand");
-    currentGameMode = thirdGameMode; // Dealer to choose hit or stand in thirdGameMode
-    thirdGameModeDealerChooseHS();
-    // myOutputValue =
-    //   "Player chose to stand. Hit submit once more †o see whether dealer chose to hit or stand."; // must hit submit once more for main function to run again
-    // return myOutputValue;
-  }
-};
-
-var thirdGameModeDealerChooseHS = function (input) {
-  var summarySoFarText = `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br>Dealer has ${computerCardsName} and a total of ${sumComputerCards}. `;
-
-  // randomise Dealer hit/stand choice
+// game logic for dealer
+var dealerHS = function () {
+  // randomly choose to hit or stand for dealer
   var hitStandArray = ["hit", "stand"];
   var getRandomInteger = function (max) {
     return Math.floor(Math.random() * max);
   };
 
   var randomIndex = getRandomInteger(hitStandArray.length);
-  var computerHSChoice = hitStandArray[randomIndex];
+  var dealerHSChoice = hitStandArray[randomIndex];
 
-  // if sumComputerCards <17 -> must draw more cards, so set computerHSCards as "hit" automatically
-  while (sumComputerCards < 17) {
-    // computerHSChoice = "hit";
-    console.log("dealer chose hit");
-    var computerCard = shuffledDeck.pop();
-    computerCardsName.push(computerCard.name);
-    computerCardsScore.push(computerCard.score);
-    sumComputerCards = sumCards(computerCardsScore);
+  // if dealer chose < 17 -> draw more cards, so set dealerHSChoice as "hit" automatically
+  while (sumDealerCards < 17) {
+    console.log("dealer chose hit automatically because < 17 cards");
+    var dealerCard = shuffledDeck.pop();
+    dealerCardsName.push(dealerCard.name);
+    dealerCardsScore.push(dealerCard.score);
+    sumDealerCards = sumCards(dealerCardsScore);
     console.log(
-      "as sumComputerCards is <17, dealer had to hit. Dealer score: " +
-        sumComputerCards
+      `As sumComputerCards was <17, dealer had to hit. Dealer score: ${sumDealerCards}`
     );
   }
-  computerHSChoice = "stand";
 
-  // if computerHSchoice is hit, then add cards,
-  if (computerHSChoice == "hit") {
-    console.log("dealer chose hit");
-    computerCard = shuffledDeck.pop();
-    computerCardsName.push(computerCard.name);
-    computerCardsScore.push(computerCard.score);
-    console.log(
-      "Dealer chose to hit. pushed dealer card. Pushed card: " +
-        computerCard.name
-    );
-    console.log(
-      "Dealer's holdings: " +
-        computerCardsName +
-        "<br><br>Dealer's score: " +
-        computerCardsScore
-    );
+  // dealerHSChoice = "stand";
 
+  if (dealerHSChoice == "hit") {
+    console.log("dealer chose to hit");
+    var dealerCard = shuffledDeck.pop();
+    dealerCardsName.push(dealerCard.name);
+    dealerCardsScore.push(dealerCard.score);
+
+    sumDealerCards = sumCards(dealerCardsScore);
     sumPlayerCards = sumCards(playerCardsScore);
-    sumComputerCards = sumCards(computerCardsScore);
-    summarySoFarText = `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br>Dealer has ${computerCardsName} and a total of ${sumComputerCards}. `;
-
-    console.log(
-      "after Dealer chose hit, sumComputerCards = " + sumComputerCards
-    );
-    console.log(
-      "Dealer chose to hit. " +
-        `Player now has ${playerCardsName} and a total of ${sumPlayerCards}. <br>Dealer has ${computerCardsName} and a total of ${sumComputerCards}. `
-    );
-
-    // check winning conditions between player and Dealer
-
-    // if dealer busted, end game. Else, computerHSChoice == "stand"
-
-    if (sumComputerCards > 21) {
-      gameEnded = 1;
-      console.log(summarySoFarText);
-      myOutputValue =
-        summarySoFarText +
-        "<br><br>Dealer has busted. Dealer loses and player wins! Click submit again to restart game.";
-      return myOutputValue;
-    }
-    if (sumComputerCards < 17) {
-      computerHSChoice = "hit";
-      console.log("dealer still < 17, must hit again");
-      myOutputValue =
-        myOutputValue +
-        "<br><br>Dealer's score is too low. Click submit for dealer to hit again.";
-    }
-
-    if (sumComputerCards >= 17 && sumComputerCards <= 21) {
-      // myOutputValue =
-      //   summarySoFarText +
-      //   "<br><br>Player, please enter 'hit' or 'stand', then click submit.";
-      // currentGameMode = secondGameMode;
-      // return myOutputValue;
-      computerHSChoice = "stand";
-      myOutputValue =
-        myOutputValue +
-        "<br><br>Dealer is done hitting. Click submit again to proceed.";
-    }
   }
-  // if computerHS choice is stand, then evaluate result
-  if (computerHSChoice == "stand") {
-    console.log("Dealer chose" + computerHSChoice);
-    evaluateWinner();
-  }
+  //   if (sumDealerCards > 21) {
+  //     gameEnded = 1;
+  //     var dealerText = `Dealer chose to hit. <br>Dealer holdings: ${dealerCardsName}<br>Dealer score: ${sumDealerCards}`;
+  //     // TODO: output text for ending game
+  //   }
+
+  //   if (sumDealerCards >= 17 && sumDealerCards <= 21) {
+  //     // TODO: evaluate winner
+  //   }
+  // }
+
+  // if (sumDealerCards >= 17 && sumDealerCards <= 21) {
+  //   // TODO: evaluate winner
+  // }
 };
-
-// output texts (only include those that don't have string literal to avoid logic flow issues)
-var myOutputValue = "";
-
-var main = function (input) {
-  // create the deck
-  deck = makeDeck();
-  // run shuffle function
-  shuffledDeck = shuffleCards(deck);
-
-  // if is firstGameMode, deal cards to players
-  if (gameEnded == 0) {
-    if (currentGameMode == firstGameMode) {
-      // execute firstModeDealCards
-      firstModeDealCards();
-      return myOutputValue;
-    }
-    if (currentGameMode == secondGameMode) {
-      // user decides to hit or stand, then dealer decides to hit or stand
-      secondModePlayerChooseHS(input);
-      return myOutputValue;
-    }
-    if (currentGameMode == thirdGameMode) {
-      // already called thirdGameMode function within secondGameMode. So no need call again here but just output the value.
-
-      return myOutputValue;
-    }
-  }
-  if (gameEnded == 1) {
-    computerCardsName = [];
-    playerCardsName = [];
-
-    playerCardsScore = [];
-    computerCardsScore = [];
-
-    sumPlayerCards = 0;
-    sumComputerCards = 0;
-    currentGameMode = firstGameMode;
-    // firstModeDealCards();
-    gameEnded = 0;
-
-    return "Welcome back to the game! Click submit to play the game again.";
-  }
-};
-
 // var main = function (input) {
 //   var finalOutput = gameLogic(input);
 //   return finalOutput;

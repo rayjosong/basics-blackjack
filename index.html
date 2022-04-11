@@ -86,124 +86,77 @@
     />
 
     <!-- CSS -->
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Open Sans", sans-serif;
-        margin-left: 30px;
-        margin-right: 30px;
-        background-color: white;
-        color: black; /* sets the font color */
-        background-image: url(""); /* The image used */
-        background-position: center; /* Center the image */
-        background-repeat: no-repeat; /* Do not repeat the image */
-        background-size: cover; /* Resize the background image to cover the entire container */
-      }
-
-      #output-div img {
-        display: block;
-        max-width: 100%;
-        max-height: 200px;
-      }
-      .header {
-        text-align: center;
-        font-size: 1.1rem;
-        margin-bottom: 3rem;
-      }
-
-      #container {
-        background-color: darkblue;
-        margin: 40px auto;
-        max-width: 800px;
-        padding: 38px 31px;
-      }
-
-      input {
-        font-size: 21px;
-        line-height: 33px;
-        margin: 0 0 23px 0;
-        padding: 0 9px;
-        width: 100%;
-      }
-
-      #input-text {
-        color: white;
-      }
-
-      #output-text {
-        color: white;
-      }
-
-      button {
-        font-size: 21px;
-        line-height: 33px;
-        margin: 0 0 23px 0;
-        padding: 0 6px;
-      }
-
-      #output-div {
-        background-color: lightgrey;
-        margin: 20px auto;
-        padding: 20px;
-        width: 100%;
-      }
-
-      .logo-img {
-        height: 49px;
-        position: relative;
-        top: 22px;
-      }
-
-      /* increase header font size on wider screens */
-      @media screen and (min-width: 600px) {
-        .header {
-          font-size: 2rem;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="./style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
   </head>
 
   <body>
     <h1 class="header">
-      <img
-        class="logo-img"
-        src="https://ra-web-files.s3.ap-southeast-1.amazonaws.com/all/brand/logo.png"
-      />
-      Rocket Academy
-      <img
-        class="logo-img"
-        src="https://ra-web-files.s3.ap-southeast-1.amazonaws.com/all/brand/logo.png"
-      />
+      <img class="logo-img" src="./assets/java-script.png" />Javascript Games
+      <img class="logo-img" src="./assets/java-script.png" />
     </h1>
-    <h1 class="header">♣️ Basics - Blackjack ♠️</h1>
+    <h1 class="header">♣️ BlackJack ♠️</h1>
     <div id="container">
       <p id="input-text"><b>Input:</b></p>
       <input id="input-field" />
       <br />
-      <button id="submit-button">Submit</button>
-      <p id="output-text"><b>Output:</b></p>
-      <div id="output-div"></div>
+      <button id="draw-button" class="btn btn-dark mt-3 mb-3">Draw</button>
+      <button id="hit-button" class="btn btn-success mt-3 ms-2 mb-3">
+        Hit
+      </button>
+      <button id="stand-button" class="btn btn-danger mt-3 ms-2 mb-3">
+        Stand
+      </button>
+      <!-- <button id="submit-button">Submit</button> -->
+      <p id="output-text"><b>Results</b></p>
+
+      <div id="output-div">
+        <img class='flex'
+        src="https://c.tenor.com/xtp2N6fg2SwAAAAC/stickergiant-game-time.gif" ;
+        alt="start game" style="border-radius: 10px; margin: auto; display:
+        inline"
+      </div>
     </div>
     <!-- Import program logic -->
     <script src="script.js"></script>
     <!-- Define button click functionality -->
     <script>
-      var button = document.querySelector("#submit-button");
-      button.addEventListener("click", function () {
-        // Set result to input value
-        var input = document.querySelector("#input-field");
-        var result = main(input.value);
-
-        // Display result in output element
+      var drawCard = document.querySelector("#draw-button");
+      drawCard.addEventListener("click", function () {
         var output = document.querySelector("#output-div");
-        output.innerHTML = result;
-
-        // Reset input value
-        input.value = "";
+        output.innerHTML = deal();
       });
+
+      var hitbtn = document.querySelector("#hit-button");
+      hitbtn.addEventListener("click", function () {
+        var output1 = document.querySelector("#output-div");
+        output1.innerHTML = hit();
+      });
+
+      var standbtn = document.querySelector("#stand-button");
+      standbtn.addEventListener("click", function () {
+        var output2 = document.querySelector("#output-div");
+        output2.innerHTML = stand();
+      });
+
+      // var button = document.querySelector("#submit-button");
+      // button.addEventListener("click", function () {
+      //   // Set result to input value
+      //   var input = document.querySelector("#input-field");
+      //   var result = main(input.value);
+
+      //   // Display result in output element
+      //   var output = document.querySelector("#output-div");
+      //   output.innerHTML = result;
+
+      //   // Reset input value
+      //   input.value = "";
+      // });
     </script>
   </body>
 </html>
